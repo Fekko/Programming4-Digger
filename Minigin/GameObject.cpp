@@ -3,22 +3,34 @@
 #include "ResourceManager.h"
 #include "Renderer.h"
 
+#include "AudioComponent.h"
+#include "PhysicsComponent.h"
+#include "RenderComponent.h"
+#include "TransformComponent.h"
+#include "InputComponent.h"
+#include "FpsComponent.h"
+
 dae::GameObject::~GameObject() = default;
 
-void dae::GameObject::Update(){}
+void dae::GameObject::Update([[maybe_unused]] float deltaTime) {
+	if (m_pAudioComponent)		m_pAudioComponent->Update(deltaTime);
+	if (m_pPhysicsComponent)	m_pPhysicsComponent->Update(deltaTime);
+	if (m_pRenderComponent)		m_pRenderComponent->Update(deltaTime);
+	if (m_pTransformComponent)	m_pTransformComponent->Update(deltaTime);
+	if (m_pInputComponent)		m_pInputComponent->Update(deltaTime);
+	if (m_pFpsComponent)		m_pFpsComponent->Update(deltaTime);
+}
 
 void dae::GameObject::Render() const
 {
-	const auto& pos = m_transform.GetPosition();
-	Renderer::GetInstance().RenderTexture(*m_texture, pos.x, pos.y);
+	if (m_pRenderComponent) m_pRenderComponent->Render();
+	if (m_pFpsComponent)	m_pFpsComponent->Render();
 }
 
-void dae::GameObject::SetTexture(const std::string& filename)
-{
-	m_texture = ResourceManager::GetInstance().LoadTexture(filename);
+void dae::GameObject::Destroy() {
+	isAlive = false;
 }
 
-void dae::GameObject::SetPosition(float x, float y)
-{
-	m_transform.SetPosition(x, y, 0.0f);
+bool dae::GameObject::IsAlive() const {
+	return isAlive;
 }
